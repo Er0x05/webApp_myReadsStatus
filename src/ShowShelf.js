@@ -3,8 +3,6 @@ import React from 'react';
 import ShowBook from './ShowBook';
 import BooksApp from './App';
 
-import Test from './test';
-
 const ShowShelf = (props) => { 
 return(
     <div className="bookshelf">
