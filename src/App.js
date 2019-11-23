@@ -4,12 +4,15 @@ import * as BooksAPI from './BooksAPI';
 
 import './App.css';
 import ShowShelf from './ShowShelf';
+import ShowBook from './ShowBook';
 
 class BooksApp extends React.Component {
   state = {
     currentlyReading: [],
     wantToRead: [],
-    read: []
+    read: [],
+    query: [],
+    search: []
   }
 
   componentDidMount(){
@@ -19,7 +22,7 @@ class BooksApp extends React.Component {
   getBooks = () => {
     BooksAPI.getAll()
       .then((books)=>{
-        const getInfo = books.map((book)=>(
+        let getInfo = books.map((book)=>(
           {
             authors: book.authors,
             title: book.title,
@@ -54,12 +57,37 @@ class BooksApp extends React.Component {
     )
   }
 
+  getSearch = ( key ) => {
+    key.keyCode === 13 && (
+      BooksAPI.search(this.state.query)
+        .then(books=>{
+          let getInfo = books.map((book)=>(
+            {
+              authors: book.authors,
+              title: book.title,
+              image: book.imageLinks.thumbnail,
+              shelf: book.shelf,
+              id: book.id
+            }
+          ));
+          this.setState({ search: getInfo });
+          console.log(this.state.search);
+          console.log(this.state.search.length)
+        })
+    )
+  }
+
+  clearSearch = () => {
+    this.setState({search:[]})
+  }
+
   render() {
     return (
       <div className="app">
         <Route exact path="/" render={()=>(
             <div className="list-books">
             <div className="list-books-title">
+
               <h1>MyReads</h1>
             </div>
             <div className="list-books-content">
@@ -86,14 +114,25 @@ class BooksApp extends React.Component {
         <Route path="/search" render={ ()=>(
           <div className="search-books">
             <div className="search-books-bar">
-              <Link to="/" className="close-search">Close</Link>          
+              <Link to="/" className="close-search" onClick={this.clearSearch}>Close</Link>
               <div className="search-books-input-wrapper">
                 {/*search terms.*/}
-                <input type="text" placeholder="Search by title or author"/>
+                <input 
+                  type="text" 
+                  placeholder="Search by title or author" 
+                  onChange ={ e=>this.setState({query:e.target.value})}
+                  onKeyDown ={ e=>this.getSearch(e)} />
               </div>
             </div>
             <div className="search-books-results">
-              <ol className="books-grid"></ol>
+              <ol className="books-grid">
+                { this.state.search.length > 0 && (
+                  this.state.search.map( item => (
+                    <ShowBook
+                      book={item} 
+                      update={(value,book)=>this.updateStatus(value,book)}/>))
+                )}
+              </ol>
             </div>
           </div>
         )}/>
