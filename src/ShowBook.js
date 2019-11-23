@@ -6,7 +6,9 @@ const ShowBook = (props) => (
         <div className="book-top">
         <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url("${props.book.image}")` }}></div>
         <div className="book-shelf-changer">
-            <select>
+            <select 
+                onChange={e=>props.update(e.target.value,props.book)}
+                defaultValue={props.book.shelf}>
             <option value="move" disabled>Move to...</option>
             <option value="currentlyReading">Currently Reading</option>
             <option value="wantToRead">Want to Read</option>
