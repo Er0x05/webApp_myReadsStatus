@@ -43,17 +43,39 @@ class BooksApp extends React.Component {
     book.shelf !== value && (
       BooksAPI.update(book,value)
         .then(res=>{
-          this.setState( preState => {
-            let index;
-            preState[book.shelf].forEach((v,i)=>{
-              v.id === book.id && (index = i);
-            });
-            preState[book.shelf].splice(index,1);
-            book.shelf = value;
-            preState[value].push(book);
-            return preState
-          })
-        })
+          //new book to lib
+          if (book.shelf){
+            if (value === "none"){
+              this.setState( preState =>{
+                preState[book.shelf].forEach((item,index)=>{
+                  item.id === book.id && preState[book.shelf].splice(index,1);
+                })
+                return preState;
+              })
+            } else {
+              this.setState( preState => {
+                let index;
+                preState[book.shelf].forEach((v,i)=>{
+                  v.id === book.id && (index = i);
+                });
+                preState[book.shelf].splice(index,1);
+                book.shelf = value;
+                preState[value].push(book);
+                return preState 
+              })
+            }
+          } else {
+            if (value !== "none"){
+              this.setState(preState=>{
+                book.shelf = value;
+                preState[value].push(book);
+                console.log(`"${book.title}" has be add "${value}" shelf!`)
+                return preState;
+              })
+            }
+            }
+          }
+        )
     )
   }
 
@@ -71,9 +93,7 @@ class BooksApp extends React.Component {
             }
           ));
           this.setState({ search: getInfo });
-          console.log(this.state.search);
-          console.log(this.state.search.length)
-        })
+        }).catch(rej=>console.log(rej))
     )
   }
 
@@ -129,6 +149,7 @@ class BooksApp extends React.Component {
                 { this.state.search.length > 0 && (
                   this.state.search.map( item => (
                     <ShowBook
+                      key={item.id}
                       book={item} 
                       update={(value,book)=>this.updateStatus(value,book)}/>))
                 )}
