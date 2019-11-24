@@ -69,6 +69,11 @@ class BooksApp extends React.Component {
               this.setState(preState=>{
                 book.shelf = value;
                 preState[value].push(book);
+                preState.search && (
+                  preState.search.forEach((item,index)=>{
+                    item.id === book.id && preState.search.splice(index,1);
+                  })
+                );
                 console.log(`"${book.title}" has be add "${value}" shelf!`)
                 return preState;
               })
